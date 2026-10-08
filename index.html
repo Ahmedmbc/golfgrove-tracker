@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Golf Grove PS/PC Tracker</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Golf Grove J454 PS/PC Nomination Tracker — standalone, host anywhere. Light lavender / dark, Theme toggle. */
+:root{
+  --bg:#EFEDF7; --panel:#FFFFFF; --ink:#241F35; --ink2:#6E6A85; --line:#DDD9EC;
+  --brand:#6D28D9; --brand-soft:#EEE8FB; --bar:#101D15; --bar-ink:#F3F2EC;
+  --open:#6E6A85; --openbg:#ECEAF4; --nom:#8A5A00; --nombg:#F6E8CC; --app:#166A42; --appbg:#DCEDE2;
+  --late:#B3261E; --shadow:0 1px 2px rgba(36,31,53,.07);
+  --sans:'Archivo',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+html[data-theme="dark"]{
+  --bg:#141221; --panel:#1E1B2E; --ink:#EBE8F5; --ink2:#9B96B3; --line:#363150;
+  --brand:#A78BFA; --brand-soft:#2B2344; --bar:#0C1810; --bar-ink:#EDEBE2;
+  --open:#9B96B3; --openbg:#2A2740; --nom:#E2B35C; --nombg:#3A2F17; --app:#7ED0A2; --appbg:#1C3527;
+  --late:#F2766B; --shadow:0 1px 2px rgba(0,0,0,.4);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;padding-bottom:48px}
+.bar{background:var(--bar);color:var(--bar-ink);position:sticky;top:0;z-index:5}
+.bar .in{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:12px 16px;flex-wrap:wrap}
+.logo{background:var(--brand);color:#fff;font-weight:800;border-radius:10px;padding:8px 10px;font-size:15px;letter-spacing:.02em}
+.bar h1{font-size:17px;margin:0;font-weight:700}
+.live{border:1.5px solid var(--brand);color:var(--brand);border-radius:999px;font-size:11px;font-weight:700;padding:2px 10px;letter-spacing:.06em}
+html[data-theme="dark"] .live{color:#C8B5FD;border-color:#C8B5FD}
+.themebtn{margin-left:auto;background:transparent;border:1px solid rgba(255,255,255,.35);color:var(--bar-ink);border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer;font-family:var(--sans)}
+.wrap{max-width:1120px;margin:0 auto;padding:16px}
+.meta{font-family:var(--mono);font-size:12px;color:var(--ink2);margin:2px 0 12px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);min-width:0}
+.kpi.hero{border-left:4px solid var(--brand)}
+.kpi .lab{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}
+html[data-theme="dark"] .kpi .lab{color:#C8B5FD}
+.kpi .val{font-family:var(--mono);font-size:22px;font-weight:600;margin-top:4px;font-variant-numeric:tabular-nums}
+.kpi .note{font-size:11.5px;color:var(--ink2);margin-top:3px}
+.val.neg{color:var(--late)} .val.pos{color:var(--app)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 14px;font-size:13px;cursor:pointer;font-family:var(--sans);box-shadow:var(--shadow)}
+.chip b{font-family:var(--mono);font-weight:600;margin-left:6px;color:var(--ink2)}
+.chip.on{background:var(--bar);border-color:var(--bar);color:var(--bar-ink)}
+.chip.on b{color:var(--bar-ink)}
+.fbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+.fbar input[type=search],.fbar select{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:8px 11px;font-size:13px;font-family:var(--sans)}
+.fbar input[type=search]{flex:1;min-width:170px}
+.mode{font-size:11.5px;color:var(--ink2);margin-left:auto}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.tbh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.tbh h2{font-size:15px;margin:0}
+.tbh .cnt{font-family:var(--mono);font-size:12px;color:var(--ink2)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:1040px;font-size:12.5px}
+th{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--brand);text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;font-weight:700}
+html[data-theme="dark"] th{color:#C8B5FD}
+td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.sect td{background:var(--brand-soft);font-weight:800;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);border-left:3px solid var(--brand)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.ref{font-family:var(--mono);font-size:12px;white-space:nowrap;color:var(--ink2)}
+td.desc{min-width:220px;max-width:330px}
+td.desc .pc{color:var(--ink2);font-size:11.5px;margin-top:2px}
+.pill{display:inline-block;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
+.pill.open{background:var(--openbg);color:var(--open)}
+.pill.nominated{background:var(--nombg);color:var(--nom)}
+.pill.appointed{background:var(--appbg);color:var(--app)}
+.late{color:var(--late);font-weight:600}
+.amber{color:var(--nom);font-weight:600}
+.muted{color:var(--ink2)}
+td.ed{cursor:pointer}
+td.ed:hover{outline:1.5px dashed var(--brand);outline-offset:-2px}
+td input{width:100%;border:1px solid var(--brand);border-radius:6px;padding:4px 6px;font:inherit;background:var(--panel);color:var(--ink)}
+.legend{font-size:11.5px;color:var(--ink2);padding:11px 16px;border-top:1px solid var(--line);line-height:1.65}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;background:var(--ink);color:var(--bg);padding:9px 18px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;max-width:88%}
+.toast.show{opacity:.96}
+@media (max-width:640px){ .bar h1{font-size:14px} .kpi .val{font-size:18px} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in">
+  <span class="logo">GG</span>
+  <h1>PS / PC Nomination Tracker</h1>
+  <span class="live">LIVE</span>
+  <button class="themebtn" id="themebtn">&#9680; Theme</button>
+</div></div>
+
+<div class="wrap">
+<div class="meta">Golf Grove (J454) &middot; Plot 6850752, Me&rsquo;aisem First, Dubai &middot; Regent Star / POE / MBC &middot; <span id="asof"></span></div>
+
+<div class="kpis" id="kpis"></div>
+<div class="chips" id="chips"></div>
+
+<div class="fbar">
+  <input type="search" id="q" placeholder="Search description, ref, letter or supplier&hellip;">
+  <select id="ftype"><option value="">PS + PC</option><option value="PS">PS only</option><option value="PC">PC only</option></select>
+  <select id="fbill"><option value="">All bills</option><option>B08</option><option>B09</option><option>B15</option><option>B18</option></select>
+  <span class="mode" id="mode"></span>
+</div>
+
+<div class="card">
+  <div class="tbh"><h2>PS / PC Register &mdash; All Bills</h2><span class="cnt" id="cnt"></span></div>
+  <div class="scroll"><table>
+    <thead><tr>
+      <th>Ref</th><th>Description</th><th class="num">BOQ / Allowance</th>
+      <th>Early Fin. (BL R4)</th><th>Late Fin. (BL R4)</th><th class="num">Delay E / L (cd)</th>
+      <th>Status</th><th>Nominated Supplier / S-C</th><th>Letter &middot; Date</th>
+      <th class="num">Nominated (AED)</th><th class="num">Variance</th>
+    </tr></thead>
+    <tbody id="tb"></tbody>
+  </table></div>
+  <div class="legend">
+    Click a status pill to cycle Open &rarr; Nominated &rarr; Appointed; supplier, letter and amount cells are editable (changes save on this device). All figures AED excl. VAT.
+    Early / Late Finish are the nomination-activity dates in the approved Baseline Rev.3-4; Delay E / L is in calendar days from each &mdash; measured at the nomination letter date for nominated items and at today for open items.
+    <span class="late">Red</span> = past the LATE finish (consuming programme float); <span class="amber">amber</span> = past early finish only, still inside float.
+    Letter 141 (Casa Mia, order placed 15-Sep-26) covers TL-01 flooring, SK-01 skirting and TL-04 wall tiles; letter 148 (Ciao Ceramics &mdash; TL-03 Pietra Grey, 2,400.48 m&sup2; @ 32.50) shares row B09-W02, order due 13-Oct-26.
+    Balance PC scope to be instructed: commercial ceramics CT-01 / CT-SK and the wooden joinery / doors package.
+  </div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+/* Register baseline — verified against nomination letters 129/130/131/136/139/141/144/145/146/148,
+   IPC-05 and the approved Baseline Rev.3-4. Figures AED excl. VAT. */
+const TODAY = new Date();
+const R = [];
+function ps(sn,grp,desc,boq,st,sup,let_,ld,amt,rem){R.push({id:'PS-'+String(sn).padStart(2,'0'),type:'PS',bill:(sn===10||sn===11)?'B15':'B18',grp,desc,boq,status:st||'Open',sup:sup||'',letter:let_||'',ldate:ld||'',amt:amt??null,rem:rem||''});}
+function pc(ref,grp,desc,qty,rate,boq,st,sup,let_,ld,amt,rem){R.push({id:ref,type:'PC',bill:ref.slice(0,3),grp,desc,qty,rate,boq,status:st||'Open',sup:sup||'',letter:let_||'',ldate:ld||'',amt:amt??null,rem:rem||''});}
+const BL={'PS-01':['2026-07-08','2026-07-15'],'PS-02':['2026-07-18','2026-09-07'],'PS-03':['2026-07-28','2026-08-25'],'PS-04':['2026-06-28','2026-07-02'],'PS-05':['2026-07-08','2026-07-15'],'PS-06':['2026-06-28','2026-08-27'],'PS-07':['2026-06-28','2026-08-19'],'PS-08':['2026-07-08','2026-07-12'],'PS-09':['2026-07-28','2026-09-22'],'PS-10':['2026-06-18','2026-07-02'],'PS-11':['2026-08-17','2026-10-23'],'PS-12':['2026-08-27','2026-10-20'],'PS-13':['2026-06-28','2026-06-29'],'PS-14':['2026-07-08','2026-08-14'],'PS-15':['2026-09-16','2026-11-05'],'PS-16':['2026-07-08','2026-07-26'],'PS-17':['2026-10-16','2026-12-27'],'PS-18':['2026-08-07','2026-08-09'],'PS-19':['2026-05-25','2026-06-21'],'PS-20':['2026-07-06','2026-07-22'],'PS-21':['2026-06-16','2026-06-28'],'PS-22':['2026-08-17','2026-09-08'],'PS-23':['2026-09-27','2026-10-22'],'PS-24':['2026-08-07','2026-08-20'],'PS-25':['2026-07-09','2026-08-24'],'PS-26':['2026-06-16','2026-07-02'],'PS-27':['2026-08-17','2027-01-01'],'PS-28':['2026-08-23','2026-12-06'],'PS-29':['2026-07-18','2026-10-28'],'PS-30':['2026-07-08','2026-12-07'],'PS-31':['2026-07-28','2026-10-09'],'PS-32':['2026-07-18','2026-10-16'],
+'B08-D1':['2026-06-27','2026-07-11'],'B08-D2':['2026-06-27','2026-07-11'],'B08-D3':['2026-06-27','2026-07-11'],'B08-D3A':['2026-06-27','2026-07-11'],'B08-D4':['2026-06-27','2026-07-11'],'B08-D6':['2026-06-27','2026-07-11'],'B08-OTH':['2026-06-27','2026-07-11'],
+'B09-F01':['2026-06-29','2026-07-21'],'B09-F02':['2026-06-29','2026-07-21'],'B09-F03':['2026-06-29','2026-07-21'],'B09-F04':['2026-06-29','2026-07-21'],'B09-W01':['2026-06-29','2026-07-21'],'B09-W02':['2026-06-29','2026-07-21'],'B09-S01':['2026-06-29','2026-07-21'],'B09-S02':['2026-06-29','2026-07-21'],'B09-S03':['2026-06-29','2026-07-21'],'B09-S04':['2026-06-29','2026-07-21'],'B09-T01':['2026-08-08','2026-10-15'],'B09-T02':['2026-08-08','2026-10-15'],'B09-W03':[null,null]};
+
+ps(10,'Conveying','Conveying System — Passenger Lifts PL1 + PL2',300000,'Appointed','Electra Elevator & Escalators LLC','POE/MBC/B-153/26/130','2026-07-13',300000,'Nominated at PS exactly; wheelchair lift excluded from letter 130');
+ps(11,'Conveying','Wheelchair Lift',30000,'','','','',null,'Decision pending — Electra quoted 42,000 (AED 12,000 exposure)');
+ps(6,'Mechanical & Electrical','Access Control System incl. Gate Barrier',80000,'Appointed','Advanced Integrated Technologies (AIT)','POE/MBC/B-153/L/129','2026-06-26',55200);
+ps(13,'Mechanical & Electrical','CCTV System (SIRA design)',120000,'Appointed','Advanced Integrated Technologies (AIT)','POE/MBC/B-153/L/129','2026-06-26',149000);
+ps(7,'Mechanical & Electrical','Audio Intercom System (Comelit)',30000,'Appointed','Advanced Integrated Technologies (AIT)','POE/MBC/B-153/L/26/136','2026-08-20',26110,'Advance % subject to agreement — claimed via AIT 10% row');
+ps(2,'Mechanical & Electrical','Home Automation System (LifeSmart — 98 units)',300000,'Nominated','Pixel Plus LLC','POE/MBC/B-153/26/145','2026-09-18',225000,'Agreement to be executed; 30% advance per letter');
+ps(14,'Mechanical & Electrical','Façade Lighting System (4 elevations incl. AC/DC wiring)',100000,'Nominated','AILED Lighting Trading LLC','POE/MBC/B-153/26/146','2026-09-18',125000,'Agreement to be executed; 10% advance per letter');
+ps(12,'Mechanical & Electrical','Light Fixtures (supply only)',50000);
+ps(15,'Mechanical & Electrical','Wiring Accessories (supply only)',50000);
+ps(16,'Plumbing & Sanitary','Sanitary Wares, Mixers & Accessories (supply only)',575000,'Appointed','Casamia L.L.C','POE/MBC/B-153/26/139','2026-08-25',489604,'Agreement signed 29-Aug-26; 30% advance');
+ps(17,'Plumbing & Sanitary','Mirrors — wash basin areas',50000);
+ps(8,'Fit-Out & Amenities','Entrance Lobby Interior Fit-Out',250000);
+ps(9,'Fit-Out & Amenities','Roof Utilities Fit-Out',300000);
+ps(18,'Fit-Out & Amenities','Gypsum Suspended False Ceiling Works',375000);
+ps(30,'Fit-Out & Amenities','Sauna & Cold Plunge Rooms',50000);
+ps(27,'Fit-Out & Amenities','Gym Equipment',200000);
+ps(25,'Fit-Out & Amenities','Garbage Chute System incl. 3 nos. 2.5 CBM trolleys',80000,'Nominated','Solitude Trading L.L.C','POE/MBC/B-153/26/144','2026-09-17',51000,'Agreement to be executed; 30% advance per letter');
+ps(28,'Fit-Out & Amenities','Ironmongery (supply only)',90000);
+ps(4,'Kitchens & Joinery','MDF Kitchen Cabinets',540000,'','','','',null,'Project-deepest chain (−128 wd at 07-Oct-26)');
+ps(31,'Kitchens & Joinery','Kitchen Countertop & Backsplash (supply only)',290000);
+ps(26,'Kitchens & Joinery','Kitchen Appliances',480000);
+ps(3,'Kitchens & Joinery','MDF Wardrobes',390000);
+ps(5,'Kitchens & Joinery','Vanity Counters (supply only)',105000);
+ps(1,'Kitchens & Joinery','Back-to-Wall WC Storage Cabinets',75000);
+ps(19,'External & Landscape','Swimming Pool & Open Shower Area (civil & MEP)',280000,'Appointed','Infinite Leisure Swimming Pools Installation','POE/MBC/B-153/26/131','2026-07-17',324397,'Agreement signed 11-Aug-26');
+ps(20,'External & Landscape','Private Plunge Pools — 9 nos. (civil & MEP)',200000,'Appointed','Infinite Leisure Swimming Pools Installation','POE/MBC/B-153/26/131','2026-07-17',247503,'Agreement signed 02-Aug-26');
+ps(21,'External & Landscape','Landscape Works',200000,'','','','',null,'Selection required — releases landscaping SD approval');
+ps(24,'External & Landscape','Roof Canopy',500000);
+ps(22,'Structure & Façade','GRC Profiles to Elevations',75000);
+ps(23,'Signage & Access','Signage — internal',100000);
+ps(29,'Signage & Access','External Signage',25000);
+ps(32,'Signage & Access','Stone Cladding & Concealed LED to Signage Panels',40000);
+
+pc('B08-D1','Doors — PC Supply','D1 — Flat Entrance Doors',98,2600,254800);
+pc('B08-D2','Doors — PC Supply','D2 — Bedroom Doors',42,1300,54600);
+pc('B08-D3','Doors — PC Supply','D3 — Bathroom Doors',98,1300,127400);
+pc('B08-D3A','Doors — PC Supply','D3A — Powder Room Doors',21,1300,27300);
+pc('B08-D4','Doors — PC Supply','D4 — Laundry / Storage Doors',35,1300,45500);
+pc('B08-D6','Doors — PC Supply','D6 — Service Room Doors',39,1800,70200);
+pc('B08-OTH','Doors — PC Supply','D6*/D7/D8/D9/D101/D103/D104/D105 — Other Door Types',null,null,54900);
+pc('B09-F01','Finishes — Floor','CT-01 Ceramic Floor Tiles — general areas',400,30,12000,'','','','',null,'Commercial ceramics — separate instruction awaited');
+pc('B09-F02','Finishes — Floor','TL-01 Porcelain 60×120 Floor — lift lobbies',579,40,23160,'Appointed','Casa Mia L.L.C','POE/MBC/B-153/26/141','2026-09-09',26634,'@46/m²; order placed 15-Sep-26');
+pc('B09-F03','Finishes — Floor','TL-01 Porcelain 60×120 Floor — flats',4196,40,167840,'Appointed','Casa Mia L.L.C','POE/MBC/B-153/26/141','2026-09-09',193016,'@46/m²; order placed 15-Sep-26');
+pc('B09-F04','Finishes — Floor','TL-01 Porcelain 20×120 Floor — private terraces',1091,40,43640,'Appointed','Casa Mia L.L.C','POE/MBC/B-153/26/141','2026-09-09',50186,'@46/m²; order placed 15-Sep-26');
+pc('B09-W01','Finishes — Wall','CT-01 Ceramic Wall Tiles — general',554,30,16620,'','','','',null,'Commercial ceramics — separate instruction awaited');
+pc('B09-W02','Finishes — Wall','TL-04 + TL-03 Porcelain Wall Tiles — bath / WC / wash / changing',4191,40,167640,'Nominated','Casa Mia (TL-04) + Ciao Ceramics (TL-03)','141 + 148','2026-10-02',195385,'TL-04: 1,863 m² @63 (letter 141, ordered). TL-03 Pietra Grey: 2,400.48 m² @32.50 = 78,016 (letter 148) — order due 13-Oct-26');
+pc('B09-S01','Finishes — Skirting','CT-SK Ceramic Skirting 100 mm — general',500,8,4000,'','','','',null,'Commercial ceramics — separate instruction awaited');
+pc('B09-S02','Finishes — Skirting','SK-01 Porcelain Skirting — lift lobbies',141,10,1410,'Appointed','Casa Mia L.L.C','POE/MBC/B-153/26/141','2026-09-09',1974,'@14/RM; order placed 15-Sep-26');
+pc('B09-S03','Finishes — Skirting','SK-01 Porcelain Skirting — flats',4423,10,44230,'Appointed','Casa Mia L.L.C','POE/MBC/B-153/26/141','2026-09-09',61922,'@14/RM; order placed 15-Sep-26');
+pc('B09-S04','Finishes — Skirting','SK-01 Porcelain Skirting — private terraces',1546,10,15460,'Appointed','Casa Mia L.L.C','POE/MBC/B-153/26/141','2026-09-09',21644,'@14/RM; order placed 15-Sep-26');
+pc('B09-T01','Finishes — Thresholds & Trims','Marble Threshold 20 mm',180,100,18000);
+pc('B09-T02','Finishes — Thresholds & Trims','Aluminium Profile Floor Separator',167,20,3340);
+pc('B09-W03','Finishes — Thresholds & Trims','Wallpaper Finish',287,200,57400);
+
+const STATUSES=['Open','Nominated','Appointed'];
+const MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const fmt=n=>n==null?'—':Math.round(n).toLocaleString('en-US');
+const dfmt=s=>{if(!s)return '';const d=new Date(s+'T00:00:00');return String(d.getDate()).padStart(2,'0')+'-'+MO[d.getMonth()]+'-'+String(d.getFullYear()%100).padStart(2,'0');};
+const DAY=86400000;
+let overlay={}, filt={status:'',q:'',type:'',bill:''};
+try{ overlay=JSON.parse(localStorage.getItem('gg_pspc')||'{}'); }catch(e){ overlay={}; }
+const merged=()=>R.map(r=>Object.assign({},r,overlay[r.id]||{}));
+function delays(r){const bl=BL[r.id]||[null,null];if(!bl[0])return{ef:null,lf:null,dE:null,dL:null};
+  const ef=new Date(bl[0]+'T00:00:00'),lf=new Date(bl[1]+'T00:00:00');
+  const ref=(r.status!=='Open'&&r.ldate)?new Date(r.ldate+'T00:00:00'):TODAY;
+  return{ef:bl[0],lf:bl[1],dE:Math.round((ref-ef)/DAY),dL:Math.round((ref-lf)/DAY)};}
+const isLate=r=>{const x=delays(r);return r.status==='Open'&&x.dL!=null&&x.dL>0;};
+const isPastE=r=>{const x=delays(r);return r.status==='Open'&&x.dE!=null&&x.dE>0;};
+
+function kpis(){
+  const M=merged();
+  const boq=M.reduce((s,r)=>s+r.boq,0);
+  const nomRows=M.filter(r=>r.amt!=null&&r.status!=='Open');
+  const nom=nomRows.reduce((s,r)=>s+r.amt,0);
+  const vari=nomRows.reduce((s,r)=>s+(r.amt-r.boq),0);
+  const cnt=s=>M.filter(r=>r.status===s).length;
+  const latePS=M.filter(r=>r.type==='PS'&&isLate(r)).length;
+  const pastE=M.filter(r=>r.type==='PS'&&isPastE(r)).length;
+  const K=[
+    {lab:'Total BOQ Budget',val:'AED '+fmt(boq),note:'32 PS + 20 PC supply allowances',hero:1},
+    {lab:'Total Nominated',val:'AED '+fmt(nom),note:nomRows.length+' items covered by letters 129–148',hero:1},
+    {lab:'Variance vs Allowance',val:(vari>=0?'+ ':'− ')+fmt(Math.abs(vari)),note:'PS − 72,186 / PC + '+fmt(vari+72186),cls:vari>=0?'pos':'neg'},
+    {lab:'Open Items',val:String(cnt('Open')),note:'of 52 — awaiting nomination'},
+    {lab:'Nominated / Appointed',val:cnt('Nominated')+' / '+cnt('Appointed'),note:'letters issued / agreements & orders in place'},
+    {lab:'Open PS past Early / Late Finish',val:pastE+' / '+latePS,note:'vs Baseline Rev.3-4 — past LATE finish = driving negative float',cls:latePS?'neg':''},
+  ];
+  document.getElementById('kpis').innerHTML=K.map(k=>`<div class="kpi${k.hero?' hero':''}"><div class="lab">${k.lab}</div><div class="val ${k.cls||''}">${k.val}</div><div class="note">${k.note}</div></div>`).join('');
+  const C=[['','All Items',M.length],['Open','Open',cnt('Open')],['Nominated','Nominated',cnt('Nominated')],['Appointed','Appointed',cnt('Appointed')]];
+  document.getElementById('chips').innerHTML=C.map(c=>`<button class="chip${filt.status===c[0]?' on':''}" data-s="${c[0]}">${c[1]}<b>${c[2]}</b></button>`).join('');
+  document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{filt.status=b.dataset.s;render();});
+}
+function render(){
+  kpis();
+  const M=merged().filter(r=>(!filt.status||r.status===filt.status)&&(!filt.type||r.type===filt.type)&&(!filt.bill||r.bill===filt.bill)&&(!filt.q||(r.desc+' '+r.id+' '+r.sup+' '+r.letter).toLowerCase().includes(filt.q)));
+  let html='',lastGrp='';
+  for(const r of M){
+    if(r.grp!==lastGrp){html+=`<tr class="sect"><td colspan="11">${r.grp}</td></tr>`;lastGrp=r.grp;}
+    const x=delays(r);
+    const open=r.status==='Open';
+    const dtxt=(x.dE==null)?'—':((x.dE>0?'+':'')+x.dE+' / '+(x.dL>0?'+':'')+x.dL);
+    const dcl=(x.dL!=null&&x.dL>0)?'late':((x.dE!=null&&x.dE>0)?'amber':'muted');
+    const varc=(r.amt!=null&&r.status!=='Open')?r.amt-r.boq:null;
+    html+=`<tr data-id="${r.id}">
+      <td class="ref">${r.id}</td>
+      <td class="desc">${r.desc}${r.qty?`<div class="pc">${r.qty.toLocaleString()} ${r.bill==='B08'?'no.':(r.id.includes('S0')||r.id==='B09-T01'||r.id==='B09-T02'?'m':'m²')} @ PC ${r.rate}</div>`:''}${r.rem?`<div class="pc">${r.rem}</div>`:''}</td>
+      <td class="num">${fmt(r.boq)}</td>
+      <td><span class="muted">${x.ef?dfmt(x.ef):'—'}</span></td>
+      <td><span class="${(open&&x.dL>0)?'late':'muted'}">${x.lf?dfmt(x.lf):'—'}${(open&&x.dL>0)?' ▲':''}</span></td>
+      <td class="num"><span class="${dcl}">${dtxt}</span></td>
+      <td><span class="pill ${r.status.toLowerCase()}" data-act="st">${r.status}</span></td>
+      <td class="ed" data-f="sup">${r.sup||'<span class="muted">—</span>'}</td>
+      <td class="ed" data-f="letter">${r.letter?`${r.letter}<div class="pc">${dfmt(r.ldate)}</div>`:'<span class="muted">—</span>'}</td>
+      <td class="num ed" data-f="amt">${fmt(r.amt)}</td>
+      <td class="num">${varc==null?'—':(varc>=0?'+ ':'− ')+fmt(Math.abs(varc))}</td>
+    </tr>`;
+  }
+  document.getElementById('tb').innerHTML=html;
+  document.getElementById('cnt').textContent=M.length+' of 52 items';
+}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),2400);}
+function save(id,patch){
+  overlay[id]=Object.assign({},overlay[id]||{},patch);
+  try{ localStorage.setItem('gg_pspc',JSON.stringify(overlay)); }catch(e){ toast('Saved on screen only'); }
+  render();
+}
+document.getElementById('tb').addEventListener('click',ev=>{
+  const tr=ev.target.closest('tr[data-id]');if(!tr)return;
+  const id=tr.dataset.id;
+  if(ev.target.closest('[data-act="st"]')){
+    const cur=merged().find(r=>r.id===id).status;
+    save(id,{status:STATUSES[(STATUSES.indexOf(cur)+1)%STATUSES.length]});return;
+  }
+  const cell=ev.target.closest('td.ed');if(!cell||cell.querySelector('input'))return;
+  const f=cell.dataset.f;
+  const r=merged().find(x=>x.id===id);
+  const old=f==='amt'?(r.amt??''):(r[f]||'');
+  cell.innerHTML=`<input value="${String(old).replace(/"/g,'&quot;')}">`;
+  const inp=cell.querySelector('input');inp.focus();
+  const done=ok=>{if(!ok){render();return;}
+    let v=inp.value.trim();
+    if(f==='amt'){v=v===''?null:Number(v.replace(/[, ]/g,''));if(v!==null&&!isFinite(v)){toast('Enter a number');render();return;}}
+    save(id,{[f]:v});};
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')done(true);if(e.key==='Escape')done(false);});
+  inp.addEventListener('blur',()=>done(true));
+});
+document.getElementById('q').addEventListener('input',e=>{filt.q=e.target.value.toLowerCase();render();});
+document.getElementById('ftype').addEventListener('change',e=>{filt.type=e.target.value;render();});
+document.getElementById('fbill').addEventListener('change',e=>{filt.bill=e.target.value;render();});
+document.getElementById('asof').textContent='Letters to POE/MBC/B-153/26/148 (02-Oct-26) · status at '+String(TODAY.getDate()).padStart(2,'0')+'-'+MO[TODAY.getMonth()]+'-'+TODAY.getFullYear();
+document.getElementById('mode').textContent='edits save on this device';
+
+/* Theme: system default; button toggles and remembers */
+const root=document.documentElement;
+function applyTheme(t){ if(t==='dark'){root.setAttribute('data-theme','dark');} else {root.removeAttribute('data-theme');} }
+let theme=null;
+try{ theme=localStorage.getItem('gg_theme'); }catch(e){}
+if(theme==='dark'){applyTheme('dark');}
+else if(theme==='light'){applyTheme('light');}
+else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){applyTheme('dark');theme='dark';}
+document.getElementById('themebtn').onclick=()=>{
+  theme=(root.getAttribute('data-theme')==='dark')?'light':'dark';
+  applyTheme(theme);
+  try{ localStorage.setItem('gg_theme',theme); }catch(e){}
+};
+render();
+</script>
+</body>
+</html>
