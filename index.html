@@ -55,7 +55,7 @@ html[data-theme="dark"] .kpi .lab{color:#C8B5FD}
 .tbh h2{font-size:15px;margin:0}
 .tbh .cnt{font-family:var(--mono);font-size:12px;color:var(--ink2)}
 .scroll{overflow-x:auto}
-table{border-collapse:collapse;width:100%;min-width:1040px;font-size:12.5px}
+table{border-collapse:collapse;width:100%;min-width:1120px;font-size:12.5px}
 th{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--brand);text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;font-weight:700}
 html[data-theme="dark"] th{color:#C8B5FD}
 td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
@@ -107,7 +107,7 @@ td input{width:100%;border:1px solid var(--brand);border-radius:6px;padding:4px 
     <thead><tr>
       <th>Ref</th><th>Description</th><th class="num">BOQ / Allowance</th>
       <th>Early Fin. (BL R4)</th><th>Late Fin. (BL R4)</th><th class="num">Delay E / L (cd)</th>
-      <th>Status</th><th>Nominated Supplier / S-C</th><th>Letter &middot; Date</th>
+      <th>Status</th><th>Nominated Supplier / S-C</th><th>Letter Ref</th><th>Nominated Date</th>
       <th class="num">Nominated (AED)</th><th class="num">Variance</th>
     </tr></thead>
     <tbody id="tb"></tbody>
@@ -231,7 +231,7 @@ function render(){
   const M=merged().filter(r=>(!filt.status||r.status===filt.status)&&(!filt.type||r.type===filt.type)&&(!filt.bill||r.bill===filt.bill)&&(!filt.q||(r.desc+' '+r.id+' '+r.sup+' '+r.letter).toLowerCase().includes(filt.q)));
   let html='',lastGrp='';
   for(const r of M){
-    if(r.grp!==lastGrp){html+=`<tr class="sect"><td colspan="11">${r.grp}</td></tr>`;lastGrp=r.grp;}
+    if(r.grp!==lastGrp){html+=`<tr class="sect"><td colspan="12">${r.grp}</td></tr>`;lastGrp=r.grp;}
     const x=delays(r);
     const open=r.status==='Open';
     const dtxt=(x.dE==null)?'—':((x.dE>0?'+':'')+x.dE+' / '+(x.dL>0?'+':'')+x.dL);
@@ -246,7 +246,8 @@ function render(){
       <td class="num"><span class="${dcl}">${dtxt}</span></td>
       <td><span class="pill ${r.status.toLowerCase()}" data-act="st">${r.status}</span></td>
       <td class="ed" data-f="sup">${r.sup||'<span class="muted">—</span>'}</td>
-      <td class="ed" data-f="letter">${r.letter?`${r.letter}<div class="pc">${dfmt(r.ldate)}</div>`:'<span class="muted">—</span>'}</td>
+      <td class="ed" data-f="letter">${r.letter||'<span class="muted">—</span>'}</td>
+      <td class="ed" data-f="ldate" style="white-space:nowrap">${r.ldate?dfmt(r.ldate):'<span class="muted">—</span>'}</td>
       <td class="num ed" data-f="amt">${fmt(r.amt)}</td>
       <td class="num">${varc==null?'—':(varc>=0?'+ ':'− ')+fmt(Math.abs(varc))}</td>
     </tr>`;
@@ -276,6 +277,14 @@ document.getElementById('tb').addEventListener('click',ev=>{
   const done=ok=>{if(!ok){render();return;}
     let v=inp.value.trim();
     if(f==='amt'){v=v===''?null:Number(v.replace(/[, ]/g,''));if(v!==null&&!isFinite(v)){toast('Enter a number');render();return;}}
+    if(f==='ldate'&&v!==''){
+      let iso=null,m=v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if(m){iso=m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0');}
+      else{m=v.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+        if(m){const y=m[3].length===2?('20'+m[3]):m[3];iso=y+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0');}}
+      if(!iso||isNaN(new Date(iso+'T00:00:00').getTime())){toast('Enter the date as dd-mm-yyyy');render();return;}
+      v=iso;
+    }
     save(id,{[f]:v});};
   inp.addEventListener('keydown',e=>{if(e.key==='Enter')done(true);if(e.key==='Escape')done(false);});
   inp.addEventListener('blur',()=>done(true));
