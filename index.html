@@ -82,7 +82,7 @@ td input{width:100%;border:1px solid var(--brand);border-radius:6px;padding:4px 
 @media (min-width:1000px){
   .scroll{overflow-x:visible}
   table{min-width:0;width:100%;table-layout:fixed;font-size:11.5px}
-  th{white-space:normal;padding:7px 6px;font-size:10px}
+  th{white-space:normal;padding:7px 5px;font-size:9.5px;letter-spacing:.03em;overflow-wrap:break-word}
   td{padding:6px 6px;word-wrap:break-word;overflow-wrap:break-word}
   td.desc{min-width:0;max-width:none}
   td.desc .pc{font-size:10.5px}
@@ -116,10 +116,10 @@ td input{width:100%;border:1px solid var(--brand);border-radius:6px;padding:4px 
   <div class="tbh"><h2>PS / PC Register &mdash; All Bills</h2><span class="cnt" id="cnt"></span></div>
   <div class="scroll"><table>
     <colgroup><col style="width:4.6%"><col style="width:19.6%"><col style="width:6.6%"><col style="width:6.8%"><col style="width:6.8%"><col style="width:6.6%"><col style="width:7.4%"><col style="width:11.4%"><col style="width:9%"><col style="width:6.8%"><col style="width:7.6%"><col style="width:6.8%"></colgroup><thead><tr>
-      <th>Ref</th><th>Description</th><th class="num">BOQ / Allowance</th>
-      <th>Early Fin. (BL R4)</th><th>Late Fin. (BL R4)</th><th class="num">Delay E / L (cd)</th>
-      <th>Status</th><th>Nominated Supplier / S-C</th><th>Letter Ref</th><th>Nominated Date</th>
-      <th class="num">Nominated (AED)</th><th class="num">Variance</th>
+      <th>Ref</th><th>Description</th><th class="num">BOQ (AED)</th>
+      <th>Early Fin.</th><th>Late Fin.</th><th class="num">Delay E/L</th>
+      <th>Status</th><th>Supplier / S-C</th><th>Letter Ref</th><th>Nom. Date</th>
+      <th class="num">Nominated</th><th class="num">Var.</th>
     </tr></thead>
     <tbody id="tb"></tbody>
   </table></div>
