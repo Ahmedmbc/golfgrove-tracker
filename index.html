@@ -128,7 +128,7 @@ td input{width:100%;border:1px solid var(--brand);border-radius:6px;padding:4px 
     Early / Late Finish are the nomination-activity dates in the approved Baseline Rev.3-4; Delay E / L is in calendar days from each &mdash; measured at the nomination letter date for nominated items and at today for open items.
     <span class="late">Red</span> = past the LATE finish (consuming programme float); <span class="amber">amber</span> = past early finish only, still inside float.
     Letter 141 (Casa Mia, order placed 15-Sep-26) covers TL-01 flooring, SK-01 skirting and TL-04 wall tiles; letter 148 (Ciao Ceramics &mdash; TL-03 Pietra Grey, 2,400.48 m&sup2; @ 32.50) shares row B09-W02, order due 13-Oct-26.
-    Balance PC scope to be instructed: commercial ceramics CT-01 / CT-SK and the wooden joinery / doors package.
+    Letter 149 (Al Aiqaa Carpenters &amp; Paints — AED 963,746, 07-Oct-26) covers the joinery package: PS-04 kitchens, PS-03 wardrobes, PS-01 WC annex cabinets and PS-05 vanity cabinets (joinery only); agreement to be executed. Balance PC scope to be instructed: commercial ceramics CT-01 / CT-SK and the doors PC supply package (Bill 8).
   </div>
 </div>
 </div>
@@ -136,7 +136,7 @@ td input{width:100%;border:1px solid var(--brand);border-radius:6px;padding:4px 
 
 <script>
 'use strict';
-/* Register baseline — verified against nomination letters 129/130/131/136/139/141/144/145/146/148,
+/* Register baseline — verified against nomination letters 129/130/131/136/139/141/144/145/146/148/149,
    IPC-05 and the approved Baseline Rev.3-4. Figures AED excl. VAT. */
 const TODAY = new Date();
 const R = [];
@@ -164,12 +164,12 @@ ps(30,'Fit-Out & Amenities','Sauna & Cold Plunge Rooms',50000);
 ps(27,'Fit-Out & Amenities','Gym Equipment',200000);
 ps(25,'Fit-Out & Amenities','Garbage Chute System incl. 3 nos. 2.5 CBM trolleys',80000,'Nominated','Solitude Trading L.L.C','POE/MBC/B-153/26/144','2026-09-17',51000,'Agreement to be executed; 30% advance per letter');
 ps(28,'Fit-Out & Amenities','Ironmongery (supply only)',90000);
-ps(4,'Kitchens & Joinery','MDF Kitchen Cabinets',540000,'','','','',null,'Project-deepest chain (−128 wd at 07-Oct-26)');
+ps(4,'Kitchens & Joinery','MDF Kitchen Cabinets',540000,'Nominated','Al Aiqaa Carpenters & Paints Contracting','POE/MBC/B-153/26/149','2026-10-07',494518.50,'Kitchen BOQ Rev.3 — 98 apartments, 7 types; agreement to be executed. Project-deepest chain (−128 wd at 07-Oct-26)');
 ps(31,'Kitchens & Joinery','Kitchen Countertop & Backsplash (supply only)',290000);
 ps(26,'Kitchens & Joinery','Kitchen Appliances',480000);
-ps(3,'Kitchens & Joinery','MDF Wardrobes',390000);
-ps(5,'Kitchens & Joinery','Vanity Counters (supply only)',105000);
-ps(1,'Kitchens & Joinery','Back-to-Wall WC Storage Cabinets',75000);
+ps(3,'Kitchens & Joinery','MDF Wardrobes',390000,'Nominated','Al Aiqaa Carpenters & Paints Contracting','POE/MBC/B-153/26/149','2026-10-07',344470,'98 apartments, 514.75 m² face area; agreement to be executed');
+ps(5,'Kitchens & Joinery','Vanity Counters (supply only)',105000,'Nominated','Al Aiqaa Carpenters & Paints Contracting','POE/MBC/B-153/26/149','2026-10-07',54687.50,'Joinery only — 119 nos (98 master bath + 21 powder); countertop, backsplash, sanitary ware & mirror billed under their own BOQ lines');
+ps(1,'Kitchens & Joinery','Back-to-Wall WC Storage Cabinets',75000,'Nominated','Al Aiqaa Carpenters & Paints Contracting','POE/MBC/B-153/26/149','2026-10-07',70070,'77 nos annex cabinets above WC (WC-01); agreement to be executed');
 ps(19,'External & Landscape','Swimming Pool & Open Shower Area (civil & MEP)',280000,'Appointed','Infinite Leisure Swimming Pools Installation','POE/MBC/B-153/26/131','2026-07-17',324397,'Agreement signed 11-Aug-26');
 ps(20,'External & Landscape','Private Plunge Pools — 9 nos. (civil & MEP)',200000,'Appointed','Infinite Leisure Swimming Pools Installation','POE/MBC/B-153/26/131','2026-07-17',247503,'Agreement signed 02-Aug-26');
 ps(21,'External & Landscape','Landscape Works',200000,'','','','',null,'Selection required — releases landscaping SD approval');
@@ -226,7 +226,7 @@ function kpis(){
   const pastE=M.filter(r=>r.type==='PS'&&isPastE(r)).length;
   const K=[
     {lab:'Total BOQ Budget',val:'AED '+fmt(boq),note:'32 PS + 20 PC supply allowances',hero:1},
-    {lab:'Total Nominated',val:'AED '+fmt(nom),note:nomRows.length+' items covered by letters 129–148',hero:1},
+    {lab:'Total Nominated',val:'AED '+fmt(nom),note:nomRows.length+' items covered by letters 129–149',hero:1},
     {lab:'Variance vs Allowance',val:(vari>=0?'+ ':'− ')+fmt(Math.abs(vari)),note:'PS − 72,186 / PC + '+fmt(vari+72186),cls:vari>=0?'pos':'neg'},
     {lab:'Open Items',val:String(cnt('Open')),note:'of 52 — awaiting nomination'},
     {lab:'Nominated / Appointed',val:cnt('Nominated')+' / '+cnt('Appointed'),note:'letters issued / agreements & orders in place'},
@@ -303,7 +303,7 @@ document.getElementById('tb').addEventListener('click',ev=>{
 document.getElementById('q').addEventListener('input',e=>{filt.q=e.target.value.toLowerCase();render();});
 document.getElementById('ftype').addEventListener('change',e=>{filt.type=e.target.value;render();});
 document.getElementById('fbill').addEventListener('change',e=>{filt.bill=e.target.value;render();});
-document.getElementById('asof').textContent='Letters to POE/MBC/B-153/26/148 (02-Oct-26) · status at '+String(TODAY.getDate()).padStart(2,'0')+'-'+MO[TODAY.getMonth()]+'-'+TODAY.getFullYear();
+document.getElementById('asof').textContent='Letters to POE/MBC/B-153/26/149 (07-Oct-26) · status at '+String(TODAY.getDate()).padStart(2,'0')+'-'+MO[TODAY.getMonth()]+'-'+TODAY.getFullYear();
 document.getElementById('mode').textContent='edits save on this device';
 
 /* Theme: system default; button toggles and remembers */
